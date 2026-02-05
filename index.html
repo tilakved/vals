@@ -36,9 +36,7 @@
         display: none;
         opacity: 0;
         transform: translateY(20px);
-        transition:
-          opacity 0.6s ease,
-          transform 0.6s ease;
+        transition: opacity 0.6s ease, transform 0.6s ease;
       }
 
       .step.active {
@@ -144,6 +142,52 @@
         height: 6px;
         border-radius: 50%;
       }
+
+      /* ---------- CUSTOM ALERT ---------- */
+      .alert-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        z-index: 10000;
+      }
+
+      .alert-backdrop.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .alert-box {
+        background: white;
+        padding: 28px 24px;
+        border-radius: 18px;
+        text-align: center;
+        max-width: 360px;
+        width: 90%;
+        transform: scale(0.8);
+        animation: alertPop 0.35s ease forwards;
+      }
+
+      .alert-box h2 {
+        color: #e63946;
+        margin-bottom: 10px;
+      }
+
+      .alert-box p {
+        font-size: 1.05rem;
+        color: #555;
+      }
+
+      @keyframes alertPop {
+        to {
+          transform: scale(1);
+        }
+      }
     </style>
   </head>
 
@@ -194,8 +238,20 @@
 
     <div id="boom">You’re Mine 😌💖</div>
 
+    <!-- CUSTOM ALERT -->
+    <div id="customAlert" class="alert-backdrop">
+      <div class="alert-box">
+        <h2>Oops 😤</h2>
+        <p id="alertMsg"></p>
+        <button onclick="closeAlert()">Try Again 😌</button>
+      </div>
+    </div>
+
     <audio id="loveSong" loop>
-      <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_0b7f8f9b8c.mp3" type="audio/mp3" />
+      <source
+        src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_0b7f8f9b8c.mp3"
+        type="audio/mp3"
+      />
     </audio>
 
     <script>
@@ -203,7 +259,7 @@
         const audio = document.getElementById("loveSong");
         audio.volume = 0;
         audio.muted = true;
-      
+
         audio.play().then(() => {
           audio.muted = false;
           let v = 0;
@@ -212,11 +268,9 @@
             audio.volume = Math.min(v, 0.6);
             if (v >= 0.6) clearInterval(fade);
           }, 200);
-        }).catch(() => {
-          // autoplay blocked – will still play on first interaction
         });
       });
-      
+
       let currentStep = 1;
       let quizIndex = 0;
       let correctCount = 0;
@@ -310,8 +364,8 @@
           if (quizIndex < 2) loadQuestion();
           else if (correctCount === 2) nextStep(3);
           else {
-            alert(
-              "I will complain to Mumma regarding you and your stupid memory 😤, TRY AGAIN you answered it wrong !!",
+            showAlert(
+              "I will complain to Mumma regarding you and your stupid memory 😤"
             );
             quizIndex = 0;
             correctCount = 0;
@@ -329,7 +383,7 @@
 
       function sayYes() {
         ["finalQ", "finalText", "finalBtns"].forEach((id) =>
-          document.getElementById(id).classList.add("fade-out"),
+          document.getElementById(id).classList.add("fade-out")
         );
 
         setTimeout(() => {
@@ -340,16 +394,13 @@
         }, 600);
       }
 
-      function playMusic() {
-        const a = document.getElementById("loveSong");
-        a.volume = 0;
-        a.play();
-        let v = 0;
-        const f = setInterval(() => {
-          v += 0.05;
-          a.volume = Math.min(v, 0.6);
-          if (v >= 0.6) clearInterval(f);
-        }, 200);
+      function showAlert(message) {
+        document.getElementById("alertMsg").innerText = message;
+        document.getElementById("customAlert").classList.add("show");
+      }
+
+      function closeAlert() {
+        document.getElementById("customAlert").classList.remove("show");
       }
 
       function launchConfetti() {
@@ -364,11 +415,8 @@
           d.style.top = "-20px";
           document.body.appendChild(d);
           d.animate(
-            [
-              { transform: "translateY(0)" },
-              { transform: "translateY(110vh)" },
-            ],
-            { duration: 2500 },
+            [{ transform: "translateY(0)" }, { transform: "translateY(110vh)" }],
+            { duration: 2500 }
           );
           setTimeout(() => d.remove(), 2500);
         }
@@ -391,7 +439,7 @@
                 { transform: "translate(0,0)" },
                 { transform: `translate(${x}px,${y}px)`, opacity: 0 },
               ],
-              { duration: 1200 },
+              { duration: 1200 }
             );
             setTimeout(() => f.remove(), 1200);
           }
@@ -408,11 +456,8 @@
           h.style.fontSize = 16 + Math.random() * 20 + "px";
           document.body.appendChild(h);
           h.animate(
-            [
-              { transform: "translateY(0)" },
-              { transform: "translateY(-120vh)" },
-            ],
-            { duration: 4000 },
+            [{ transform: "translateY(0)" }, { transform: "translateY(-120vh)" }],
+            { duration: 4000 }
           );
           setTimeout(() => h.remove(), 4000);
         }
@@ -420,6 +465,3 @@
     </script>
   </body>
 </html>
-
-
-
