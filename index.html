@@ -202,6 +202,24 @@
     </audio>
 
     <script>
+      window.addEventListener("load", () => {
+        const audio = document.getElementById("loveSong");
+        audio.volume = 0;
+        audio.muted = true;
+      
+        audio.play().then(() => {
+          audio.muted = false;
+          let v = 0;
+          const fade = setInterval(() => {
+            v += 0.03;
+            audio.volume = Math.min(v, 0.6);
+            if (v >= 0.6) clearInterval(fade);
+          }, 200);
+        }).catch(() => {
+          // autoplay blocked – will still play on first interaction
+        });
+      });
+      
       let currentStep = 1;
       let quizIndex = 0;
       let correctCount = 0;
@@ -319,7 +337,6 @@
 
         setTimeout(() => {
           document.getElementById("boom").classList.add("boom-pop");
-          playMusic();
           launchConfetti();
           sideFireworks();
           createHearts();
@@ -406,4 +423,5 @@
     </script>
   </body>
 </html>
+
 
