@@ -11,6 +11,12 @@
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       }
 
+      html,
+      body {
+        width: 100%;
+        max-width: 100%;
+      }
+
       body {
         margin: 0;
         height: 100vh;
@@ -54,6 +60,7 @@
       h1 {
         color: #e63946;
       }
+
       p {
         color: #555;
         font-size: 1.1rem;
@@ -94,6 +101,7 @@
         border-color: #4caf50;
         background: #e8f5e9;
       }
+
       .option.wrong {
         border-color: #e63946;
         background: #fdecea;
@@ -109,6 +117,7 @@
         color: #e63946;
         pointer-events: none;
         z-index: 9999;
+        text-align: center;
       }
 
       .boom-pop {
@@ -144,48 +153,69 @@
       }
 
       /* ---------- CUSTOM ALERT ---------- */
-      .alert-backdrop {
+      .alert-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.45);
-        display: flex;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
         align-items: center;
         justify-content: center;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-        z-index: 10000;
-      }
-
-      .alert-backdrop.show {
-        opacity: 1;
-        pointer-events: all;
+        z-index: 99999;
       }
 
       .alert-box {
         background: white;
-        padding: 28px 24px;
+        padding: 26px 22px;
         border-radius: 18px;
-        text-align: center;
         max-width: 360px;
         width: 90%;
-        transform: scale(0.8);
-        animation: alertPop 0.35s ease forwards;
+        text-align: center;
+        animation: popIn 0.4s ease;
       }
 
       .alert-box h2 {
         color: #e63946;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
       }
 
-      .alert-box p {
-        font-size: 1.05rem;
-        color: #555;
-      }
-
-      @keyframes alertPop {
+      @keyframes popIn {
+        from {
+          transform: scale(0.7);
+          opacity: 0;
+        }
         to {
           transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      /* ---------- RESPONSIVE ---------- */
+      @media (max-width: 480px) {
+        .card {
+          padding: 28px 20px;
+          max-width: 92%;
+        }
+
+        h1 {
+          font-size: 1.6rem;
+        }
+
+        p {
+          font-size: 1rem;
+        }
+
+        button {
+          width: 100%;
+          padding: 14px;
+        }
+
+        #finalBtns {
+          flex-direction: column !important;
+        }
+
+        #boom {
+          font-size: 2.4rem;
+          padding: 0 16px;
         }
       }
     </style>
@@ -229,7 +259,13 @@
           style="flex-direction: row; justify-content: center; gap: 20px"
         >
           <button onclick="sayYes()">Yes 💖</button>
-          <button class="secondary" id="noBtn" onmouseover="moveNo(this)" onclick="moveNo(this)">
+          <button
+            class="secondary"
+            id="noBtn"
+            onmouseover="moveNo(this)"
+            ontouchstart="moveNo(this)"
+            onclick="moveNo(this)"
+          >
             No 🙈
           </button>
         </div>
@@ -239,11 +275,11 @@
     <div id="boom">You’re Mine 😌💖</div>
 
     <!-- CUSTOM ALERT -->
-    <div id="customAlert" class="alert-backdrop">
+    <div class="alert-overlay" id="alertBox">
       <div class="alert-box">
-        <h2>Oops 😤</h2>
+        <h2>😤 Hey!</h2>
         <p id="alertMsg"></p>
-        <button onclick="closeAlert()">Try Again 😌</button>
+        <button onclick="closeAlert()">Try Again</button>
       </div>
     </div>
 
@@ -255,20 +291,24 @@
     </audio>
 
     <script>
+      /* ---------- MUSIC AUTOPLAY ---------- */
       window.addEventListener("load", () => {
         const audio = document.getElementById("loveSong");
         audio.volume = 0;
         audio.muted = true;
 
-        audio.play().then(() => {
-          audio.muted = false;
-          let v = 0;
-          const fade = setInterval(() => {
-            v += 0.03;
-            audio.volume = Math.min(v, 0.6);
-            if (v >= 0.6) clearInterval(fade);
-          }, 200);
-        });
+        audio
+          .play()
+          .then(() => {
+            audio.muted = false;
+            let v = 0;
+            const fade = setInterval(() => {
+              v += 0.03;
+              audio.volume = Math.min(v, 0.6);
+              if (v >= 0.6) clearInterval(fade);
+            }, 200);
+          })
+          .catch(() => {});
       });
 
       let currentStep = 1;
@@ -296,21 +336,6 @@
           q: "What color top did I wore in my phone's photo contact?",
           options: ["Black", "Red", "White", "Grey"],
           answer: 2,
-        },
-        {
-          q: "Why do I love my phone's photo contact photo?",
-          options: ["Smile", "Moment", "You", "All"],
-          answer: 3,
-        },
-        {
-          q: "When did we first gone a date?",
-          options: ["Aug-2", "May-3", "Jun-15", "Oct-8"],
-          answer: 3,
-        },
-        {
-          q: "What did I wore on our first date?",
-          options: ["Grey", "Red", "Black", "White"],
-          answer: 3,
         },
       ].sort(() => Math.random() - 0.5);
 
@@ -348,6 +373,7 @@
 
       function submitAnswer() {
         if (selected === null) return;
+
         const q = quizPool[quizIndex];
         const opts = document.querySelectorAll(".option");
 
@@ -361,11 +387,12 @@
         setTimeout(() => {
           quizIndex++;
           selected = null;
+
           if (quizIndex < 2) loadQuestion();
           else if (correctCount === 2) nextStep(3);
           else {
             showAlert(
-              "I will complain to Mumma regarding you and your stupid memory 😤"
+              "I will complain to Mumma regarding you and your stupid memory 😤<br/><br/>TRY AGAIN!"
             );
             quizIndex = 0;
             correctCount = 0;
@@ -373,6 +400,15 @@
             loadQuestion();
           }
         }, 1200);
+      }
+
+      function showAlert(msg) {
+        document.getElementById("alertMsg").innerHTML = msg;
+        document.getElementById("alertBox").style.display = "flex";
+      }
+
+      function closeAlert() {
+        document.getElementById("alertBox").style.display = "none";
       }
 
       function moveNo(btn) {
@@ -392,15 +428,6 @@
           sideFireworks();
           createHearts();
         }, 600);
-      }
-
-      function showAlert(message) {
-        document.getElementById("alertMsg").innerText = message;
-        document.getElementById("customAlert").classList.add("show");
-      }
-
-      function closeAlert() {
-        document.getElementById("customAlert").classList.remove("show");
       }
 
       function launchConfetti() {
@@ -465,4 +492,3 @@
     </script>
   </body>
 </html>
-
