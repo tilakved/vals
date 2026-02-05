@@ -412,17 +412,38 @@
       }
 
       function moveNo(btn) {
-        const btnRect = btn.getBoundingClientRect();
-        const padding = 10; // keep small margin from edges
-        const maxX = window.innerWidth - btnRect.width - padding;
-        const maxY = window.innerHeight - btnRect.height - padding;
-        const x = Math.random() * maxX;
-        const y = Math.random() * maxY;
+      // lock positioning once
+      if (btn.dataset.moving !== "true") {
         btn.style.position = "fixed";
-        btn.style.left = `${Math.max(padding, x)}px`;
-        btn.style.top = `${Math.max(padding, y)}px`;
+        btn.style.transition = "left 0.25s ease, top 0.25s ease";
+        btn.dataset.moving = "true";
       }
-
+    
+      const rect = btn.getBoundingClientRect();
+    
+      // viewport-safe dimensions (iOS friendly)
+      const vw = document.documentElement.clientWidth;
+      const vh = document.documentElement.clientHeight;
+    
+      const padding = 12;
+    
+      const maxX = vw - rect.width - padding;
+      const maxY = vh - rect.height - padding;
+    
+      // HARD CLAMP
+      const x = Math.min(
+        maxX,
+        Math.max(padding, Math.random() * maxX)
+      );
+    
+      const y = Math.min(
+        maxY,
+        Math.max(padding, Math.random() * maxY)
+      );
+    
+      btn.style.left = `${x}px`;
+      btn.style.top = `${y}px`;
+    }
 
       function sayYes() {
         ["finalQ", "finalText", "finalBtns"].forEach((id) =>
@@ -499,5 +520,6 @@
     </script>
   </body>
 </html>
+
 
 
