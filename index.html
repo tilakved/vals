@@ -227,7 +227,7 @@
       <div class="step active" id="step1">
         <h1>Hey Chakudi 💖</h1>
         <p>I have something important to ask you…</p>
-        <button onclick="nextStep(2)">Okay 👀</button>
+        <button onclick="startMusic(); nextStep(2)">Okay 👀</button>
       </div>
 
       <!-- STEP 2 -->
@@ -292,29 +292,29 @@
 
     <script>
       /* ---------- MUSIC AUTOPLAY ---------- */
-      window.addEventListener("load", () => {
-        const audio = document.getElementById("loveSong");
-        audio.volume = 0;
-        audio.muted = true;
-
-        audio
-          .play()
-          .then(() => {
-            audio.muted = false;
-            let v = 0;
-            const fade = setInterval(() => {
-              v += 0.03;
-              audio.volume = Math.min(v, 0.6);
-              if (v >= 0.6) clearInterval(fade);
-            }, 200);
-          })
-          .catch(() => {});
-      });
+      
 
       let currentStep = 1;
       let quizIndex = 0;
       let correctCount = 0;
       let selected = null;
+      let musicStarted = false;
+      
+      function startMusic() {
+        if (musicStarted) return;
+        musicStarted = true;
+      
+        const audio = document.getElementById("loveSong");
+        audio.volume = 0;
+        audio.play().then(() => {
+          let v = 0;
+          const fade = setInterval(() => {
+            v += 0.04;
+            audio.volume = Math.min(v, 0.6);
+            if (v >= 0.6) clearInterval(fade);
+          }, 200);
+        }).catch(() => {});
+      }
 
       const quizPool = [
         {
@@ -412,10 +412,17 @@
       }
 
       function moveNo(btn) {
+        const btnRect = btn.getBoundingClientRect();
+        const padding = 10; // keep small margin from edges
+        const maxX = window.innerWidth - btnRect.width - padding;
+        const maxY = window.innerHeight - btnRect.height - padding;
+        const x = Math.random() * maxX;
+        const y = Math.random() * maxY;
         btn.style.position = "fixed";
-        btn.style.left = Math.random() * (window.innerWidth - 100) + "px";
-        btn.style.top = Math.random() * (window.innerHeight - 50) + "px";
+        btn.style.left = `${Math.max(padding, x)}px`;
+        btn.style.top = `${Math.max(padding, y)}px`;
       }
+
 
       function sayYes() {
         ["finalQ", "finalText", "finalBtns"].forEach((id) =>
@@ -492,4 +499,5 @@
     </script>
   </body>
 </html>
+
 
