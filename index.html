@@ -210,27 +210,37 @@
       const quizPool = [
         {
           q: "Where was our first photo together taken?",
-          options: ["Cafe", "Temple", "Beach", "Mall"],
-          answer: 1,
-        },
-        {
-          q: "Which color dress were you wearing in that photo?",
-          options: ["Red", "Blue", "Black", "White"],
-          answer: 0,
-        },
-        {
-          q: "Who clicked our favorite photo?",
-          options: ["Me", "You", "Friend", "Stranger"],
-          answer: 0,
-        },
-        {
-          q: "Which trip photo do I love the most?",
-          options: ["Hill", "Beach", "City", "Temple"],
+          options: ["Cafe", "Temple", "Home", "Mall"],
           answer: 2,
         },
         {
-          q: "Why do I love that photo?",
+          q: "Which color dress were you wearing in our first photo?",
+          options: ["Blue", "Grey", "Black", "White"],
+          answer: 0,
+        },
+        {
+          q: "Who clicked our first photo?",
+          options: ["You", "Me", "Friend", "Dushman"],
+          answer: 1,
+        },
+        {
+          q: "What color top did I wore in my phone's photo contact?",
+          options: ["Black", "Red", "White", "Grey"],
+          answer: 2,
+        },
+        {
+          q: "Why do I love my phone's photo contact photo?",
           options: ["Smile", "Moment", "You", "All"],
+          answer: 3,
+        },
+        {
+          q: "When did we first gone a date?",
+          options: ["Aug-2", "May-3", "Jun-15", "Oct-8"],
+          answer: 3,
+        },
+        {
+          q: "What did I wore on our first date?",
+          options: ["Grey", "Red", "Black", "White"],
           answer: 3,
         },
       ].sort(() => Math.random() - 0.5);
@@ -286,7 +296,7 @@
           else if (correctCount === 2) nextStep(3);
           else {
             alert(
-              "I will complain to Mumma regarding you and your stupid memory 😤",
+              "I will complain to Mumma regarding you and your stupid memory 😤, TRY AGAIN you answered it wrong !!",
             );
             quizIndex = 0;
             correctCount = 0;
@@ -396,3 +406,4 @@
     </script>
   </body>
 </html>
+
