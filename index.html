@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Will You Be My Valentine?</title>
+    <title>Valentine 💖</title>
 
     <style>
       * {
@@ -27,125 +27,90 @@
         border-radius: 20px;
         text-align: center;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        max-width: 400px;
+        max-width: 440px;
         width: 90%;
-        position: relative;
+        z-index: 10;
+      }
+
+      .step {
+        display: none;
+        opacity: 0;
+        transform: translateY(20px);
+        transition:
+          opacity 0.6s ease,
+          transform 0.6s ease;
+      }
+
+      .step.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .fade-out {
+        opacity: 0 !important;
+        transform: translateY(-20px) !important;
+        pointer-events: none;
       }
 
       h1 {
         color: #e63946;
-        margin-bottom: 10px;
       }
-
       p {
         color: #555;
-        margin-bottom: 30px;
         font-size: 1.1rem;
-      }
-
-      .buttons {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
+        margin: 20px 0;
       }
 
       button {
-        padding: 12px 24px;
+        padding: 12px 26px;
         border: none;
         border-radius: 30px;
         font-size: 1rem;
         cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-      }
-
-      button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-      }
-
-      .yes {
         background: #e63946;
         color: white;
+        margin-top: 20px;
       }
 
-      .no {
+      button.secondary {
         background: #f1f1f1;
         color: #333;
-        position: relative;
       }
 
-      /* Fade-out question */
-      #questionArea {
-        transition: opacity 0.6s ease, transform 0.6s ease;
-      }
-
-      .fade-out {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-
-      /* Hearts */
-      .hearts {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-      }
-
-      .heart {
-        position: absolute;
-        color: #e63946;
-        font-size: 20px;
-        animation: floatUp 4s linear infinite;
-        opacity: 0.7;
-      }
-
-      @keyframes floatUp {
-        0% {
-          transform: translateY(100vh) scale(0.8);
-          opacity: 0;
-        }
-        20% {
-          opacity: 0.7;
-        }
-        100% {
-          transform: translateY(-10vh) scale(1.2);
-          opacity: 0;
-        }
-      }
-
-      /* Shake */
-      .shake {
-        animation: shake 0.5s ease-in-out;
-      }
-
-      @keyframes shake {
-        0% { transform: translate(0, 0); }
-        20% { transform: translate(-5px, 3px); }
-        40% { transform: translate(5px, -3px); }
-        60% { transform: translate(-4px, 2px); }
-        80% { transform: translate(4px, -2px); }
-        100% { transform: translate(0, 0); }
-      }
-
-      /* Message */
-      .message {
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
         margin-top: 20px;
-        font-size: 1.3rem;
-        color: #e63946;
-        display: none;
       }
 
-      /* Boom text */
+      .option {
+        padding: 12px;
+        border-radius: 12px;
+        border: 2px solid #eee;
+        cursor: pointer;
+      }
+
+      .option.correct {
+        border-color: #4caf50;
+        background: #e8f5e9;
+      }
+      .option.wrong {
+        border-color: #e63946;
+        background: #fdecea;
+      }
+
       #boom {
         position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%) scale(0);
-        font-size: 4rem;
+        font-size: 3.5rem;
         font-weight: bold;
         color: #e63946;
-        z-index: 10000;
         pointer-events: none;
+        z-index: 9999;
       }
 
       .boom-pop {
@@ -158,193 +123,275 @@
           opacity: 0;
         }
         50% {
-          transform: translate(-50%, -50%) scale(1.2);
+          transform: translate(-50%, -50%) scale(1.3);
           opacity: 1;
         }
         100% {
           transform: translate(-50%, -50%) scale(1);
-          opacity: 0;
+          opacity: 1;
         }
       }
 
-      /* Slow motion */
-      .slowmo * {
-        animation-duration: 2s !important;
+      .confetti,
+      .firework {
+        position: fixed;
+        pointer-events: none;
+        z-index: 9998;
+      }
+
+      .firework {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
       }
     </style>
   </head>
 
   <body>
     <div class="card">
-      <div id="questionArea">
-        <h1>Hey, Chakudi 💖</h1>
-        <p>Will you be my Valentine?</p>
+      <!-- STEP 1 -->
+      <div class="step active" id="step1">
+        <h1>Hey Chakudi 💖</h1>
+        <p>I have something important to ask you…</p>
+        <button onclick="nextStep(2)">Okay 👀</button>
+      </div>
 
-        <div class="buttons">
-          <button class="yes" onclick="sayYes()">Yes 💕</button>
-          <button class="no" onmouseover="moveNo(this)">No 🙈</button>
+      <!-- STEP 2 -->
+      <div class="step" id="step2">
+        <h1>Quick Memory Check 😏</h1>
+        <p id="quizQuestion"></p>
+        <div class="options" id="options"></div>
+        <button onclick="submitAnswer()">Submit</button>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step" id="step3">
+        <h1>Hmm 😌</h1>
+        <p>
+          Ok, you have come forward enough…<br />but I will ask you one more
+          question.
+        </p>
+        <button onclick="nextStep(4)">I’m Ready 💕</button>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step" id="step4">
+        <h1 id="finalQ">Final Question 💘</h1>
+        <p id="finalText">Will you be my Valentine?</p>
+
+        <div
+          class="options"
+          id="finalBtns"
+          style="flex-direction: row; justify-content: center; gap: 20px"
+        >
+          <button onclick="sayYes()">Yes 💖</button>
+          <button class="secondary" id="noBtn" onmouseover="moveNo(this)">
+            No 🙈
+          </button>
         </div>
       </div>
-
-      <div class="message" id="message">
-        Yay!!! 💘 I knew you’d say yes 😍
-      </div>
-
-      <div id="boom">You&rsquo;re Mine 😌💖</div>
-
-      <audio id="loveSong" loop>
-        <source
-          src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_0b7f8f9b8c.mp3"
-          type="audio/mpeg"
-        />
-      </audio>
     </div>
 
-    <div class="hearts" id="hearts"></div>
+    <div id="boom">You’re Mine 😌💖</div>
+
+    <audio id="loveSong" loop>
+      <source
+        src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_0b7f8f9b8c.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
 
     <script>
-      function sayYes() {
-        const qa = document.getElementById("questionArea");
-        qa.classList.add("fade-out");
+      let currentStep = 1;
+      let quizIndex = 0;
+      let correctCount = 0;
+      let selected = null;
+
+      const quizPool = [
+        {
+          q: "Where was our first photo together taken?",
+          options: ["Cafe", "Temple", "Beach", "Mall"],
+          answer: 1,
+        },
+        {
+          q: "Which color dress were you wearing in that photo?",
+          options: ["Red", "Blue", "Black", "White"],
+          answer: 0,
+        },
+        {
+          q: "Who clicked our favorite photo?",
+          options: ["Me", "You", "Friend", "Stranger"],
+          answer: 0,
+        },
+        {
+          q: "Which trip photo do I love the most?",
+          options: ["Hill", "Beach", "City", "Temple"],
+          answer: 2,
+        },
+        {
+          q: "Why do I love that photo?",
+          options: ["Smile", "Moment", "You", "All"],
+          answer: 3,
+        },
+      ].sort(() => Math.random() - 0.5);
+
+      function nextStep(n) {
+        document
+          .getElementById(`step${currentStep}`)
+          .classList.remove("active");
+        currentStep = n;
+        document.getElementById(`step${currentStep}`).classList.add("active");
+        if (n === 2) loadQuestion();
+      }
+
+      function loadQuestion() {
+        const q = quizPool[quizIndex];
+        document.getElementById("quizQuestion").innerText = q.q;
+        const box = document.getElementById("options");
+        box.innerHTML = "";
+
+        q.options.forEach((o, i) => {
+          const div = document.createElement("div");
+          div.className = "option";
+          div.innerText = o;
+          div.onclick = () => selectOption(div, i);
+          box.appendChild(div);
+        });
+      }
+
+      function selectOption(el, i) {
+        selected = i;
+        document
+          .querySelectorAll(".option")
+          .forEach((o) => (o.style.borderColor = "#eee"));
+        el.style.borderColor = "#e63946";
+      }
+
+      function submitAnswer() {
+        if (selected === null) return;
+        const q = quizPool[quizIndex];
+        const opts = document.querySelectorAll(".option");
+
+        opts.forEach((o, i) => {
+          if (i === q.answer) o.classList.add("correct");
+          else if (i === selected) o.classList.add("wrong");
+        });
+
+        if (selected === q.answer) correctCount++;
 
         setTimeout(() => {
-          qa.style.display = "none";
-        }, 600);
-
-        document.getElementById("message").style.display = "block";
-
-        const boom = document.getElementById("boom");
-        boom.classList.remove("boom-pop");
-        void boom.offsetWidth;
-        boom.classList.add("boom-pop");
-
-        createHearts();
-        launchConfetti();
-        sideFireworks();
-        screenShake();
-        slowMotion();
-        playMusic();
-        lockNo();
+          quizIndex++;
+          selected = null;
+          if (quizIndex < 2) loadQuestion();
+          else if (correctCount === 2) nextStep(3);
+          else {
+            alert(
+              "I will complain to Mumma regarding you and your stupid memory 😤",
+            );
+            quizIndex = 0;
+            correctCount = 0;
+            quizPool.sort(() => Math.random() - 0.5);
+            loadQuestion();
+          }
+        }, 1200);
       }
 
       function moveNo(btn) {
-        const x = Math.random() * 200 - 100;
-        const y = Math.random() * 200 - 100;
-        btn.style.transform = `translate(${x}px, ${y}px)`;
+        btn.style.position = "fixed";
+        btn.style.left = Math.random() * (window.innerWidth - 100) + "px";
+        btn.style.top = Math.random() * (window.innerHeight - 50) + "px";
+      }
+
+      function sayYes() {
+        ["finalQ", "finalText", "finalBtns"].forEach((id) =>
+          document.getElementById(id).classList.add("fade-out"),
+        );
+
+        setTimeout(() => {
+          document.getElementById("boom").classList.add("boom-pop");
+          playMusic();
+          launchConfetti();
+          sideFireworks();
+          createHearts();
+        }, 600);
       }
 
       function playMusic() {
-        const audio = document.getElementById("loveSong");
-        audio.volume = 0;
-        audio.play();
-
+        const a = document.getElementById("loveSong");
+        a.volume = 0;
+        a.play();
         let v = 0;
-        const fade = setInterval(() => {
+        const f = setInterval(() => {
           v += 0.05;
-          audio.volume = Math.min(v, 0.6);
-          if (v >= 0.6) clearInterval(fade);
+          a.volume = Math.min(v, 0.6);
+          if (v >= 0.6) clearInterval(f);
         }, 200);
       }
 
-      function slowMotion() {
-        document.body.classList.add("slowmo");
-        setTimeout(() => {
-          document.body.classList.remove("slowmo");
-        }, 1000);
-      }
-
-      function lockNo() {
-        const noBtn = document.querySelector(".no");
-        noBtn.disabled = true;
-        noBtn.style.opacity = "0.5";
-        noBtn.style.cursor = "not-allowed";
-      }
-
-      function screenShake() {
-        document.body.classList.add("shake");
-        setTimeout(() => {
-          document.body.classList.remove("shake");
-        }, 500);
-      }
-
-      function createHearts() {
-        const container = document.getElementById("hearts");
-        container.innerHTML = "";
-
-        for (let i = 0; i < 30; i++) {
-          const heart = document.createElement("div");
-          heart.className = "heart";
-          heart.textContent = "❤️";
-          heart.style.left = Math.random() * 100 + "vw";
-          heart.style.animationDelay = Math.random() * 4 + "s";
-          heart.style.fontSize = 16 + Math.random() * 24 + "px";
-          container.appendChild(heart);
-        }
-      }
-
       function launchConfetti() {
-        const colors = ["#ff4d6d", "#ffd166", "#ff9a9e", "#e63946"];
-
+        const c = ["#ff4d6d", "#ffd166", "#ff9a9e", "#e63946"];
         for (let i = 0; i < 40; i++) {
-          const confetti = document.createElement("div");
-          confetti.style.position = "fixed";
-          confetti.style.top = "-10px";
-          confetti.style.left = Math.random() * 100 + "vw";
-          confetti.style.width = "8px";
-          confetti.style.height = "14px";
-          confetti.style.backgroundColor =
-            colors[Math.floor(Math.random() * colors.length)];
-          confetti.style.opacity = "0.9";
-          confetti.style.pointerEvents = "none";
-          confetti.style.zIndex = "9999";
-
-          document.body.appendChild(confetti);
-
-          const fall = 2000 + Math.random() * 1000;
-          confetti.animate(
-            [{ transform: "translateY(0)" }, { transform: "translateY(110vh)" }],
-            { duration: fall, easing: "ease-out" }
+          const d = document.createElement("div");
+          d.className = "confetti";
+          d.style.width = "8px";
+          d.style.height = "14px";
+          d.style.background = c[Math.floor(Math.random() * c.length)];
+          d.style.left = Math.random() * 100 + "vw";
+          d.style.top = "-20px";
+          document.body.appendChild(d);
+          d.animate(
+            [
+              { transform: "translateY(0)" },
+              { transform: "translateY(110vh)" },
+            ],
+            { duration: 2500 },
           );
-
-          setTimeout(() => confetti.remove(), fall);
+          setTimeout(() => d.remove(), 2500);
         }
       }
 
       function sideFireworks() {
-        const colors = ["#ff4d6d", "#ffd166", "#ff9a9e", "#e63946"];
-
-        ["left", "right"].forEach(side => {
-          for (let i = 0; i < 20; i++) {
-            const spark = document.createElement("div");
-            spark.style.position = "fixed";
-            spark.style.width = "6px";
-            spark.style.height = "6px";
-            spark.style.borderRadius = "50%";
-            spark.style.backgroundColor =
-              colors[Math.floor(Math.random() * colors.length)];
-            spark.style.top = "50%";
-            spark.style[side] = "0";
-            spark.style.pointerEvents = "none";
-            spark.style.zIndex = "9999";
-
-            document.body.appendChild(spark);
-
-            const dist = 200 + Math.random() * 200;
-            spark.animate(
+        const c = ["#ff4d6d", "#ffd166", "#ff9a9e", "#e63946"];
+        ["left", "right"].forEach((s) => {
+          for (let i = 0; i < 25; i++) {
+            const f = document.createElement("div");
+            f.className = "firework";
+            f.style.background = c[Math.floor(Math.random() * c.length)];
+            f.style.top = "50%";
+            f.style[s] = "0";
+            document.body.appendChild(f);
+            const x = s === "left" ? Math.random() * 300 : -Math.random() * 300;
+            const y = Math.random() * 300 - 150;
+            f.animate(
               [
-                { transform: "translate(0,0)", opacity: 1 },
-                {
-                  transform: `translate(${side === "left" ? dist : -dist}px,
-                    ${Math.random() * 200 - 100}px)`,
-                  opacity: 0
-                }
+                { transform: "translate(0,0)" },
+                { transform: `translate(${x}px,${y}px)`, opacity: 0 },
               ],
-              { duration: 1200, easing: "ease-out" }
+              { duration: 1200 },
             );
-
-            setTimeout(() => spark.remove(), 1200);
+            setTimeout(() => f.remove(), 1200);
           }
         });
+      }
+
+      function createHearts() {
+        for (let i = 0; i < 20; i++) {
+          const h = document.createElement("div");
+          h.innerText = "❤️";
+          h.style.position = "fixed";
+          h.style.left = Math.random() * 100 + "vw";
+          h.style.bottom = "-20px";
+          h.style.fontSize = 16 + Math.random() * 20 + "px";
+          document.body.appendChild(h);
+          h.animate(
+            [
+              { transform: "translateY(0)" },
+              { transform: "translateY(-120vh)" },
+            ],
+            { duration: 4000 },
+          );
+          setTimeout(() => h.remove(), 4000);
+        }
       }
     </script>
   </body>
